@@ -1,3 +1,15 @@
+#page-container {
+  width: 80%;
+  margin: 40px auto;
+  display: flex;
+  justify-content: space-around;
+}
+
 .headshot {
   max-height: 400px;
+}
+
+figcaption {
+  font-size: 20px;
+  text-align: center;
 }

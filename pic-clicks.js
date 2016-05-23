@@ -1,27 +1,33 @@
-function gebi(name) {
-  return document.getElementById(name);
-}
+// track what has been shown this round
+var current_array = [];
+
+// track votes over the whole session
+var votes = {};
 
 // TODO: Generate this array by reading the img folder
 var pics_array = ['Arya-Stark.jpg', 'Bran-Stark.jpg', 'Cersei-Lannister.jpg', 'Daenerys-Targaryen.jpg', 'Jon-Snow.jpg', 'Sansa-Stark.jpg', 'Tyrion-Lannister.jpg'];
-var current_array = [];
-var votes = {};
 
+//start the game here
+populate_images(pics_array);
+
+// When a click is detected, log the vote and swap in a new pic
 // TODO: Pass in pics_array without making it a global
 function swap_pic(event) {
-  var position = event.target.id;
-  console.log('Chosen position was: "' + position + '"');
   var filename = event.target.src;
   filename = filename.substring(filename.lastIndexOf('/') + 1, filename.length);
-  console.log('Filename chosen was: "' + filename + '"');
   var image_votes = add_vote(filename);
-  console.log('Total votes for that image is: "' + image_votes + '"');
 
   if (current_array.length < pics_array.length) {
+    // Show a new pic
     var next_pic = fresh_pic();
     gebi(event.target.id).src = 'img/' + pics_array[next_pic];
+    var vote_count;
+    if ( !(vote_count = votes[pics_array[next_pic]]) ) {
+      vote_count = 0;
+    }
+    event.target.nextSibling.textContent = pics_array[selection] + ': ' + vote_count + ' clicks';
   } else {
-    console.log('Emptying array and starting over.');
+    // Empty array and start over
     populate_images();
   }
 }
@@ -45,18 +51,31 @@ function populate_images() {
     img.setAttribute('id', 'pic' + i);
     img.setAttribute('src', 'img/' + pics_array[selection]);
     img.setAttribute('value', selection);
-    gebi('page-container').appendChild(img);
+    var caption = document.createElement('figcaption');
+    caption.setAttribute('id', 'vote' + i);
+    var vote_count;
+    if ( !(vote_count = votes[pics_array[selection]]) ) {
+      vote_count = 0;
+    }
+    var text = document.createTextNode(pics_array[selection] + ': ' + vote_count + ' clicks');
+    caption.appendChild(text);
+    var pic_div = document.createElement('div');
+    pic_div.appendChild(img);
+    pic_div.appendChild(caption);
+    gebi('page-container').appendChild(pic_div);
     gebi('pic' + i).addEventListener('click', swap_pic);
   }
 }
 
 function fresh_pic() {
-  var selection = Math.floor(Math.random() * pics_array.length);
-  while ( current_array.indexOf(selection) != -1) {
+  do {
     selection = Math.floor(Math.random() * pics_array.length);
-  }
+  } while (current_array.indexOf(selection) != -1);
   current_array.push(selection); // keep track of what is being shown
   return selection;
 }
 
-populate_images(pics_array);
+// utility functions
+function gebi(name) {
+  return document.getElementById(name);
+}
