@@ -1,3 +1,9 @@
+// Code Fellows 201 Week 3 - Bus Mall project
+// by Geoffrey Emerson
+
+// Constants
+const NUM_PICS_DISPLAYED = 3;
+
 // array of Item objects
 var choices = [];
 
@@ -36,7 +42,7 @@ function populate_images() {
     available_choices.push(i);
   }
   // now make random selections for the initial 4 images
-  for (var i = 0; i < 4; i++) {
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     var selection = fresh_pic();
     var img = document.createElement('img');
     img.setAttribute('class', 'headshot');
