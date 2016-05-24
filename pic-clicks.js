@@ -1,78 +1,172 @@
+// Code Fellows 201 Week 3 - Bus Mall project
+// by Geoffrey Emerson
+
+// Constants
+var NUM_PICS_DISPLAYED = 3;
+
+// array of Item objects
+var choices = [];
+
 // track what has been shown this round
-var current_array = [];
+// this array will start out full and choices get removed as they are used
+var available_choices = [];
 
-// track votes over the whole session
-var votes = {};
+// track how many times the user has made a choices
+var total_clicks = 0;
+var bonus_round = false;
 
-// TODO: Generate this array by reading the img folder
-var pics_array = ['Arya-Stark.jpg', 'Bran-Stark.jpg', 'Cersei-Lannister.jpg', 'Daenerys-Targaryen.jpg', 'Jon-Snow.jpg', 'Sansa-Stark.jpg', 'Tyrion-Lannister.jpg'];
+// list of given pics in the img directory
+var pics_array = ['Arya-Stark.jpg',
+                  'Bran-Stark.jpg',
+                  'Brienne-of-Tarth.jpg',
+                  'Cersei-Lannister.jpg',
+                  'Daenerys-Targaryen.jpg',
+                  'Hodor.jpg',
+                  'Jaime-Lannister.jpg',
+                  'Jon-Snow.jpg',
+                  'Margaery-Tyrell.jpg',
+                  'Ramsay-Bolton.jpg',
+                  'Sansa-Stark.jpg',
+                  'The-High-Sparrow.jpg',
+                  'Tommen-Baratheon.jpg',
+                  'Tyrion-Lannister.jpg'];
 
 //start the game here
+load_objects(pics_array);
+render_image_containers();
+render_buttons();
 populate_images(pics_array);
 
-// When a click is detected, log the vote and swap in a new pic
-// TODO: Pass in pics_array without making it a global
-function swap_pic(event) {
-  var filename = event.target.src;
-  filename = filename.substring(filename.lastIndexOf('/') + 1, filename.length);
-  var image_votes = add_vote(filename);
+function Item(src) {
+  this.src = 'img/' + src;
+  this.name = src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
+  this.clicks = 0;
+  this.times_shown = 0;
 
-  if (current_array.length < pics_array.length) {
-    // Show a new pic
-    var next_pic = fresh_pic();
-    gebi(event.target.id).src = 'img/' + pics_array[next_pic];
-    var vote_count;
-    if ( !(vote_count = votes[pics_array[next_pic]]) ) {
-      vote_count = 0;
-    }
-    event.target.nextSibling.textContent = pics_array[selection] + ': ' + vote_count + ' clicks';
-  } else {
-    // Empty array and start over
-    populate_images();
+  this.add_click = function() {
+    this.clicks++;
+  };
+
+  this.increment_times_shown = function() {
+    this.times_shown++;
+  };
+}
+
+function load_objects(name_array) {
+  for (var i = 0; i < name_array.length; i++) {
+    var item = new Item(name_array[i]);
+    choices.push(item);
   }
 }
 
-function add_vote(key) {
-  if (key in votes) {
-    votes[key] += 1;
-  } else {
-    votes[key] = 1;
-  }
-  return votes[key];
-}
-
-function populate_images() {
-  gebi('page-container').innerHTML = '';
-  current_array = [];
-  for (var i = 0; i < 4; i++) {
-    var selection = fresh_pic();
+function render_image_containers() {
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     var img = document.createElement('img');
     img.setAttribute('class', 'headshot');
     img.setAttribute('id', 'pic' + i);
-    img.setAttribute('src', 'img/' + pics_array[selection]);
-    img.setAttribute('value', selection);
     var caption = document.createElement('figcaption');
     caption.setAttribute('id', 'vote' + i);
-    var vote_count;
-    if ( !(vote_count = votes[pics_array[selection]]) ) {
-      vote_count = 0;
-    }
-    var text = document.createTextNode(pics_array[selection] + ': ' + vote_count + ' clicks');
+    var text = document.createTextNode('');
     caption.appendChild(text);
     var pic_div = document.createElement('div');
     pic_div.appendChild(img);
     pic_div.appendChild(caption);
-    gebi('page-container').appendChild(pic_div);
+    gebi('pic-container').appendChild(pic_div);
+  }
+  set_pic_listeners();
+}
+
+function set_pic_listeners() {
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     gebi('pic' + i).addEventListener('click', swap_pic);
   }
 }
 
+function remove_pic_listeners() {
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
+    gebi('pic' + i).removeEventListener('click', swap_pic);
+  }
+}
+
+function show_buttons() {
+  gebi('button_div').style.visibility = 'visible';
+}
+
+function grey_out_buttons() {
+  gebi('button_div').setAttribute('class', 'grey');
+}
+
+function render_buttons() {
+  var button_div = document.createElement('div');
+  button_div.setAttribute('id','button_div');
+  var button = document.createElement('button');
+  button.appendChild(document.createTextNode('Show Me The Results!'));
+  button.setAttribute('id','results_button');
+  button.addEventListener('click', display_results);
+  button_div.appendChild(button);
+  button = document.createElement('button');
+  button.appendChild(document.createTextNode('I Want to Click More!'));
+  button.setAttribute('id','click_more_button');
+  button.addEventListener('click', more_clicks);
+  button_div.appendChild(button);
+  button_div.style.visibility = 'hidden';
+  document.body.appendChild(button_div);
+}
+
+function populate_images() {
+  // now make random selections for the initial 4 images
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
+    var selection = fresh_pic();
+    var img = gebi('pic' + i);
+    img.setAttribute('src', choices[selection].src);
+    img.setAttribute('choice', selection);
+    var caption = gebi('vote' + i);
+    caption.textContent = choices[selection].name + ': ' + choices[selection].clicks + ' clicks';
+    // caption.textContent += 'Times shown: ' + choices[selection].times_shown;
+  }
+}
+
+// When a click is detected, log the vote and swap in a new pic
+function swap_pic(event) {
+  total_clicks++;
+  choices[event.target.attributes[3].value].add_click();
+  if ( total_clicks > 15 && bonus_round == false) {
+    remove_pic_listeners();
+    show_buttons();
+  } else if (total_clicks > 23) {
+    remove_pic_listeners();
+    display_results();
+    grey_out_buttons();
+  } else {
+    populate_images();
+  }
+}
+
+function more_clicks() {
+  bonus_round = true;
+  set_pic_listeners();
+  grey_out_buttons();
+}
+
+function display_results() {
+  grey_out_buttons();
+  var results_div = document.createElement('div');
+  results_div.appendChild(document.createTextNode('Results go here.'));
+  document.body.appendChild(results_div);
+}
+
 function fresh_pic() {
-  do {
-    selection = Math.floor(Math.random() * pics_array.length);
-  } while (current_array.indexOf(selection) != -1);
-  current_array.push(selection); // keep track of what is being shown
-  return selection;
+  if (0 == available_choices.length) {
+    // when out of fresh pics, rest the choices available
+    for (var i = 0; i < choices.length; i++) {
+      available_choices.push(i);
+    }
+  }
+  var choice_index = Math.floor(Math.random() * available_choices.length);
+  var choice = available_choices[choice_index];
+  available_choices.splice(choice_index,1); // eliminate the choice used
+  choices[choice].increment_times_shown();
+  return choice;
 }
 
 // utility functions
