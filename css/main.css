@@ -8,11 +8,6 @@ body {
   justify-content: space-around;
 }
 
-#results_container {
-  display: flex;
-  justify-content: flex-start;
-}
-
 #results_container > div {
   margin: 10px;
 }
@@ -32,10 +27,13 @@ figcaption {
   text-align: center;
 }
 
-#button_div {
-  margin: 30px;
+.flex_center {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+}
+
+.flex_center > button {
+  margin: 30px;
 }
 
 button {
