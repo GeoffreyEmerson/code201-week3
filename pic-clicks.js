@@ -15,16 +15,30 @@ var available_choices = [];
 var total_clicks = 0;
 
 // list of given pics in the img directory
-var pics_array = ['Arya-Stark.jpg', 'Bran-Stark.jpg', 'Cersei-Lannister.jpg', 'Daenerys-Targaryen.jpg', 'Jon-Snow.jpg', 'Sansa-Stark.jpg', 'Tyrion-Lannister.jpg', 'Jaime-Lannister.jpg', 'Hodor.jpg'];
+var pics_array = ['Arya-Stark.jpg',
+                  'Bran-Stark.jpg',
+                  'Brienne-of-Tarth.jpg',
+                  'Cersei-Lannister.jpg',
+                  'Daenerys-Targaryen.jpg',
+                  'Hodor.jpg',
+                  'Jaime-Lannister.jpg',
+                  'Jon-Snow.jpg',
+                  'Margaery-Tyrell.jpg',
+                  'Ramsay-Bolton.jpg',
+                  'Sansa-Stark.jpg',
+                  'The-High-Sparrow.jpg',
+                  'Tommen-Baratheon.jpg',
+                  'Tyrion-Lannister.jpg'];
 
 //start the game here
 load_objects(pics_array);
 render_image_containers();
+render_buttons();
 populate_images(pics_array);
 
 function Item(src) {
   this.src = 'img/' + src;
-  this.name = src.slice(0,src.lastIndexOf('.')).replace('-',' ');
+  this.name = src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
   this.clicks = 0;
 
   this.addClick = function() {
@@ -40,7 +54,6 @@ function load_objects(name_array) {
 }
 
 function render_image_containers() {
-  // gebi('page-container').innerHTML = '';
   for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     var img = document.createElement('img');
     img.setAttribute('class', 'headshot');
@@ -55,6 +68,20 @@ function render_image_containers() {
     gebi('page-container').appendChild(pic_div);
     gebi('pic' + i).addEventListener('click', swap_pic);
   }
+}
+
+function render_buttons() {
+  var button_div = document.createElement('div');
+  button_div.setAttribute('id','button_div');
+  var button = document.createElement('button');
+  button.appendChild(document.createTextNode('Show Me The Results!'));
+  button.setAttribute('id','results_button');
+  button_div.appendChild(button);
+  button = document.createElement('button');
+  button.appendChild(document.createTextNode('I Want to Click More!'));
+  button.setAttribute('id','click_more_button');
+  button_div.appendChild(button);
+  document.body.appendChild(button_div);
 }
 
 function populate_images() {
@@ -76,22 +103,6 @@ function swap_pic(event) {
   choices[event.target.attributes[3].value].addClick();
   populate_images();
 }
-
-// function new_set() {
-//   // when the game gets reset, all choice objects are available to be picked.
-//
-//   populate_images();
-//
-//   // if (available_choices.length > 0) {
-//   //   var next_pic = fresh_pic();
-//   //   var pic_element = gebi(event.target.id);
-//   //   pic_element.src = choices[next_pic].src;
-//   //   pic_element.setAttribute('choice', next_pic);
-//   //   event.target.nextSibling.textContent = choices[next_pic].name + ': ' + choices[next_pic].clicks + ' clicks';
-//   // } else {
-//   //   populate_images();
-//   // }
-// }
 
 function fresh_pic() {
   if (0 == available_choices.length) {
