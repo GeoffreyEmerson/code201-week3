@@ -40,9 +40,14 @@ function Item(src) {
   this.src = 'img/' + src;
   this.name = src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
   this.clicks = 0;
+  this.times_shown = 0;
 
-  this.addClick = function() {
+  this.add_click = function() {
     this.clicks++;
+  };
+
+  this.increment_times_shown = function() {
+    this.times_shown++;
   };
 }
 
@@ -93,6 +98,7 @@ function populate_images() {
     img.setAttribute('choice', selection);
     var caption = gebi('vote' + i);
     caption.textContent = choices[selection].name + ': ' + choices[selection].clicks + ' clicks';
+    // caption.textContent += 'Times shown: ' + choices[selection].times_shown;
   }
   console.log(available_choices);
 }
@@ -100,7 +106,7 @@ function populate_images() {
 // When a click is detected, log the vote and swap in a new pic
 function swap_pic(event) {
   total_clicks++;
-  choices[event.target.attributes[3].value].addClick();
+  choices[event.target.attributes[3].value].add_click();
   populate_images();
 }
 
@@ -114,6 +120,7 @@ function fresh_pic() {
   var choice_index = Math.floor(Math.random() * available_choices.length);
   var choice = available_choices[choice_index];
   available_choices.splice(choice_index,1); // eliminate the choice used
+  choices[choice].increment_times_shown();
   return choice;
 }
 
