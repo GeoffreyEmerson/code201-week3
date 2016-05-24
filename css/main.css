@@ -33,9 +33,10 @@ button {
   font-size: 20px;
 }
 
-.grey > button {
-  background-color: #333;
-  color: #777;
+.grey > button, .grey > button:hover, .grey > button:active {
+  background-color: #ddd;
+  color: #eee;
+  box-shadow: 0px 0px 20px 0px #bbb;
 }
 
 button:hover {

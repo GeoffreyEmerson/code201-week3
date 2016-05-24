@@ -94,6 +94,8 @@ function show_buttons() {
 
 function grey_out_buttons() {
   gebi('button_div').setAttribute('class', 'grey');
+  gebi('results_button').removeEventListener('click', display_results);
+  gebi('click_more_button').removeEventListener('click', more_clicks);
 }
 
 function render_buttons() {
