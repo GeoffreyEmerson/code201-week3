@@ -153,7 +153,17 @@ function more_clicks() {
 function display_results() {
   grey_out_buttons();
   var results_div = document.createElement('div');
-  results_div.appendChild(document.createTextNode('Results go here.'));
+  // results_div.appendChild(document.createTextNode('Results go here.'));
+  for (var i = 0; i < choices.length; i++) {
+    var individual_result_div = document.createElement('div');
+    console.log(choices[i]);
+    var build_string = choices[i].name + ': ';
+    build_string += choices[i].clicks + ' clicks out of ';
+    build_string += choices[i].times_shown + ' times shown. ';
+    build_string += Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
+    individual_result_div.appendChild(document.createTextNode(build_string));
+    results_div.appendChild(individual_result_div);
+  }
   document.body.appendChild(results_div);
 }
 
