@@ -8,34 +8,86 @@ body {
   justify-content: space-around;
 }
 
+#results_container > div {
+  margin: 10px;
+}
+
+.monospace {
+  font-family: monospace;
+  font-size: 16px;
+}
+
 .headshot {
-  height: 400px;
-  width: 300px;
+  height: auto;
+  max-width: 100px;
 }
 
 figcaption {
-  font-size: 20px;
+  font-size: 10px;
   text-align: center;
 }
 
-#button_div {
-  margin: 30px;
-  display: flex;
-  justify-content: space-around;
-}
-
 button {
-  height: 150px;
-  width: 150px;
+  height: 80px;
+  width: 80px;
   border-radius: 100%;
   border-style: solid;
-  box-shadow: 0px 0px 20px 0px #777;
-  font-size: 20px;
+  box-shadow: 0px 0px 10px 0px #777;
+  font-size: 10px;
 }
 
-.grey > button {
-  background-color: #333;
-  color: #777;
+@media (min-width:500px) {
+  .headshot {
+    max-width: 150px;
+  }
+
+  figcaption {
+    font-size: 16px;
+  }
+
+  button {
+    height: 120px;
+    width: 120px;
+    box-shadow: 0px 0px 15px 0px #777;
+    font-size: 15px;
+  }
+}
+
+@media (min-width:900px) {
+  .headshot {
+    max-width: 300px;
+  }
+
+  figcaption {
+    font-size: 20px;
+  }
+
+  button {
+    height: 150px;
+    width: 150px;
+    border-radius: 100%;
+    border-style: solid;
+    box-shadow: 0px 0px 20px 0px #777;
+    font-size: 20px;
+  }
+}
+
+.flex_center {
+  width: 100%;
+  padding:0;
+  display: flex;
+  justify-content: center;
+}
+
+.flex_center > button {
+  margin: 30px;
+}
+
+
+.grey > button, .grey > button:hover, .grey > button:active {
+  background-color: #ddd;
+  color: #eee;
+  box-shadow: 0px 0px 20px 0px #bbb;
 }
 
 button:hover {
