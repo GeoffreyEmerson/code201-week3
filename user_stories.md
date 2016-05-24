@@ -9,3 +9,7 @@
 * As a user, I want to click a few more times because clicking is fun.
 * As a user, I want to see the tally of clicks in a nice chart so that I can see what my favorites were.
 * As a client, I want to see the percentage of times an image was clicked out of how many times it was shown so that I get an accurate picture of how popular that image is.
+
+## Day 2 User Stories
+
+* As a client, I want the data to display in a slick looking chart, so that the plebs are impressed.
