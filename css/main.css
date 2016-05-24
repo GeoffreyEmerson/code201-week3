@@ -8,6 +8,20 @@ body {
   justify-content: space-around;
 }
 
+#results_container {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#results_container > div {
+  margin: 10px;
+}
+
+.monospace {
+  font-family: monospace;
+  font-size: 16px;
+}
+
 .headshot {
   height: 400px;
   width: 300px;

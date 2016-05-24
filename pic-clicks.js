@@ -152,19 +152,43 @@ function more_clicks() {
 
 function display_results() {
   grey_out_buttons();
-  var results_div = document.createElement('div');
+  var results_container = document.createElement('div');
+  results_container.setAttribute('id','results_container');
+  var text_results_div = document.createElement('div');
+  var histogram_div = document.createElement('div');
+  histogram_div.setAttribute('class', 'monospace');
+  var percentage_div = document.createElement('div');
   // results_div.appendChild(document.createTextNode('Results go here.'));
   for (var i = 0; i < choices.length; i++) {
     var individual_result_div = document.createElement('div');
     console.log(choices[i]);
     var build_string = choices[i].name + ': ';
     build_string += choices[i].clicks + ' clicks out of ';
-    build_string += choices[i].times_shown + ' times shown. ';
-    build_string += Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
+    build_string += choices[i].times_shown + ' times shown.';
     individual_result_div.appendChild(document.createTextNode(build_string));
-    results_div.appendChild(individual_result_div);
+    text_results_div.appendChild(individual_result_div);
+    //show histogram in second div
+    individual_result_div = document.createElement('div');
+    build_string = '|';
+    for (var j = 0; j < choices[i].clicks; j++) {
+      build_string += '=';
+    }
+    for (var j = choices[i].clicks; j < choices[i].times_shown; j++) {
+      build_string += '&nbsp;';
+    }
+    build_string += '|';
+    individual_result_div.innerHTML = build_string;
+    histogram_div.appendChild(individual_result_div);
+    // Show percents in third div
+    individual_result_div = document.createElement('div');
+    build_string = Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
+    individual_result_div.appendChild(document.createTextNode(build_string));
+    percentage_div.appendChild(individual_result_div);
   }
-  document.body.appendChild(results_div);
+  results_container.appendChild(text_results_div);
+  results_container.appendChild(histogram_div);
+  results_container.appendChild(percentage_div);
+  document.body.appendChild(results_container);
 }
 
 function fresh_pic() {
