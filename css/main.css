@@ -1,12 +1,16 @@
-#page-container {
+body {
   width: 80%;
   margin: 40px auto;
+}
+
+#page-container {
   display: flex;
   justify-content: space-around;
 }
 
 .headshot {
-  max-height: 400px;
+  height: 400px;
+  width: 300px;
 }
 
 figcaption {

@@ -19,6 +19,7 @@ var pics_array = ['Arya-Stark.jpg', 'Bran-Stark.jpg', 'Cersei-Lannister.jpg', 'D
 
 //start the game here
 load_objects(pics_array);
+render_image_containers();
 populate_images(pics_array);
 
 function Item(src) {
@@ -38,26 +39,33 @@ function load_objects(name_array) {
   }
 }
 
-function populate_images() {
-  gebi('page-container').innerHTML = '';
-
-  // now make random selections for the initial 4 images
+function render_image_containers() {
+  // gebi('page-container').innerHTML = '';
   for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
-    var selection = fresh_pic();
     var img = document.createElement('img');
     img.setAttribute('class', 'headshot');
     img.setAttribute('id', 'pic' + i);
-    img.setAttribute('src', choices[selection].src);
-    img.setAttribute('choice', selection);
     var caption = document.createElement('figcaption');
     caption.setAttribute('id', 'vote' + i);
-    var text = document.createTextNode(choices[selection].name + ': ' + choices[selection].clicks + ' clicks');
+    var text = document.createTextNode('');
     caption.appendChild(text);
     var pic_div = document.createElement('div');
     pic_div.appendChild(img);
     pic_div.appendChild(caption);
     gebi('page-container').appendChild(pic_div);
     gebi('pic' + i).addEventListener('click', swap_pic);
+  }
+}
+
+function populate_images() {
+  // now make random selections for the initial 4 images
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
+    var selection = fresh_pic();
+    var img = gebi('pic' + i);
+    img.setAttribute('src', choices[selection].src);
+    img.setAttribute('choice', selection);
+    var caption = gebi('vote' + i);
+    caption.textContent = choices[selection].name + ': ' + choices[selection].clicks + ' clicks';
   }
   console.log(available_choices);
 }
