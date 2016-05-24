@@ -13,6 +13,7 @@ var available_choices = [];
 
 // track how many times the user has made a choices
 var total_clicks = 0;
+var bonus_round = false;
 
 // list of given pics in the img directory
 var pics_array = ['Arya-Stark.jpg',
@@ -70,9 +71,29 @@ function render_image_containers() {
     var pic_div = document.createElement('div');
     pic_div.appendChild(img);
     pic_div.appendChild(caption);
-    gebi('page-container').appendChild(pic_div);
+    gebi('pic-container').appendChild(pic_div);
+  }
+  set_pic_listeners();
+}
+
+function set_pic_listeners() {
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     gebi('pic' + i).addEventListener('click', swap_pic);
   }
+}
+
+function remove_pic_listeners() {
+  for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
+    gebi('pic' + i).removeEventListener('click', swap_pic);
+  }
+}
+
+function show_buttons() {
+  gebi('button_div').style.visibility = 'visible';
+}
+
+function grey_out_buttons() {
+  gebi('button_div').setAttribute('class', 'grey');
 }
 
 function render_buttons() {
@@ -81,11 +102,14 @@ function render_buttons() {
   var button = document.createElement('button');
   button.appendChild(document.createTextNode('Show Me The Results!'));
   button.setAttribute('id','results_button');
+  button.addEventListener('click', display_results);
   button_div.appendChild(button);
   button = document.createElement('button');
   button.appendChild(document.createTextNode('I Want to Click More!'));
   button.setAttribute('id','click_more_button');
+  button.addEventListener('click', more_clicks);
   button_div.appendChild(button);
+  button_div.style.visibility = 'hidden';
   document.body.appendChild(button_div);
 }
 
@@ -100,14 +124,35 @@ function populate_images() {
     caption.textContent = choices[selection].name + ': ' + choices[selection].clicks + ' clicks';
     // caption.textContent += 'Times shown: ' + choices[selection].times_shown;
   }
-  console.log(available_choices);
 }
 
 // When a click is detected, log the vote and swap in a new pic
 function swap_pic(event) {
   total_clicks++;
   choices[event.target.attributes[3].value].add_click();
-  populate_images();
+  if ( total_clicks > 15 && bonus_round == false) {
+    remove_pic_listeners();
+    show_buttons();
+  } else if (total_clicks > 23) {
+    remove_pic_listeners();
+    display_results();
+    grey_out_buttons();
+  } else {
+    populate_images();
+  }
+}
+
+function more_clicks() {
+  bonus_round = true;
+  set_pic_listeners();
+  grey_out_buttons();
+}
+
+function display_results() {
+  grey_out_buttons();
+  var results_div = document.createElement('div');
+  results_div.appendChild(document.createTextNode('Results go here.'));
+  document.body.appendChild(results_div);
 }
 
 function fresh_pic() {

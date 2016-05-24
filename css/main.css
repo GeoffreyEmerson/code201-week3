@@ -3,7 +3,7 @@ body {
   margin: 40px auto;
 }
 
-#page-container {
+#pic-container {
   display: flex;
   justify-content: space-around;
 }
@@ -31,6 +31,11 @@ button {
   border-style: solid;
   box-shadow: 0px 0px 20px 0px #777;
   font-size: 20px;
+}
+
+.grey > button {
+  background-color: #333;
+  color: #777;
 }
 
 button:hover {
