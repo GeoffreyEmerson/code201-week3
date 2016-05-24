@@ -173,7 +173,6 @@ function display_results() {
   // results_div.appendChild(document.createTextNode('Results go here.'));
   for (var i = 0; i < choices.length; i++) {
     var individual_result_div = document.createElement('div');
-    console.log(choices[i]);
     var build_string = choices[i].name + ': ';
     build_string += choices[i].clicks + ' clicks out of ';
     build_string += choices[i].times_shown + ' times shown.';
