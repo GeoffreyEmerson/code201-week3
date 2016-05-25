@@ -33,15 +33,19 @@ var pics_array = ['Arya-Stark.jpg',
 
 //start the game here
 load_objects(pics_array);
+preload_images(choices);
 render_image_containers();
 render_buttons();
 populate_images(pics_array);
 
-function Item(src) {
-  this.src = 'img/' + src;
-  this.name = src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
+function Item(src, clicks) {
+  this.src = src;
   this.clicks = 0;
   this.times_shown = 0;
+
+  this.name = function() {
+    return src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
+  };
 
   this.add_click = function() {
     this.clicks++;
@@ -53,9 +57,21 @@ function Item(src) {
 }
 
 function load_objects(name_array) {
-  for (var i = 0; i < name_array.length; i++) {
-    var item = new Item(name_array[i]);
-    choices.push(item);
+  var stored_object_array;
+  if (stored_object_array = localStorage.image_object_array) {
+    stored_object_array = JSON.parse(stored_object_array);
+  } else {
+    for (var i = 0; i < name_array.length; i++) {
+      var item = new Item(name_array[i]);
+      choices.push(item);
+    }
+  }
+}
+
+function preload_images(obj_array) {
+  for (var i = 0; i < obj_array.length; i++) {
+    var temp_image = new Image();
+    temp_image.src = 'img/' + obj_array[i].src;
   }
 }
 
@@ -128,10 +144,10 @@ function populate_images() {
   for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     var selection = fresh_pic();
     var img = gebi('pic' + i);
-    img.setAttribute('src', choices[selection].src);
+    img.setAttribute('src', 'img/' + choices[selection].src);
     img.setAttribute('choice', selection);
     var caption = gebi('vote' + i);
-    caption.textContent = choices[selection].name;
+    caption.textContent = choices[selection].name();
   }
 }
 
@@ -178,7 +194,7 @@ function display_results() {
   var clicks_array = [];
   var times_shown_array = [];
   for (var i = 0; i < choices.length; i++) {
-    label_array.push(choices[i].name);
+    label_array.push(choices[i].name());
     clicks_array.push(choices[i].clicks);
     times_shown_array.push(Math.floor(choices[i].clicks / choices[i].times_shown * 100));
   }
@@ -218,43 +234,6 @@ function display_results() {
     }
   });
 
-  // var results_container = document.createElement('div');
-  // results_container.setAttribute('id','results_container');
-  // results_container.setAttribute('class', 'flex_center');
-  // var text_results_div = document.createElement('div');
-  // var histogram_div = document.createElement('div');
-  // histogram_div.setAttribute('class', 'monospace');
-  // var percentage_div = document.createElement('div');
-  // // results_div.appendChild(document.createTextNode('Results go here.'));
-  // for (var i = 0; i < choices.length; i++) {
-  //   var individual_result_div = document.createElement('div');
-  //   var build_string = choices[i].name + ': ';
-  //   build_string += choices[i].clicks + ' clicks out of ';
-  //   build_string += choices[i].times_shown + ' times shown.';
-  //   individual_result_div.appendChild(document.createTextNode(build_string));
-  //   text_results_div.appendChild(individual_result_div);
-  //   //show histogram in second div
-  //   individual_result_div = document.createElement('div');
-  //   build_string = '|';
-  //   for (var j = 0; j < choices[i].clicks; j++) {
-  //     build_string += '=';
-  //   }
-  //   for (var j = choices[i].clicks; j < choices[i].times_shown; j++) {
-  //     build_string += '&nbsp;';
-  //   }
-  //   build_string += '|';
-  //   individual_result_div.innerHTML = build_string;
-  //   histogram_div.appendChild(individual_result_div);
-  //   // Show percents in third div
-  //   individual_result_div = document.createElement('div');
-  //   build_string = Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
-  //   individual_result_div.appendChild(document.createTextNode(build_string));
-  //   percentage_div.appendChild(individual_result_div);
-  // }
-  // results_container.appendChild(text_results_div);
-  // results_container.appendChild(histogram_div);
-  // results_container.appendChild(percentage_div);
-  // document.body.appendChild(results_container);
   render_restart_button();
   smooth_scroll_to(canvas_container_div);
 }
@@ -297,8 +276,8 @@ function fresh_pic() {
 }
 
 // utility functions
-function gebi(name) {
-  return document.getElementById(name);
+function gebi(target_id) {
+  return document.getElementById(target_id);
 }
 
 function smooth_scroll_to(element, last_jump) {
