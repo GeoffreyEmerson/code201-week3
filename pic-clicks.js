@@ -44,9 +44,7 @@ render_buttons();
 function Item(src, clicks, times_shown) {
   this.src = src;
   this.clicks = clicks || 0;
-  console.log(this.clicks);
   this.times_shown = times_shown || 0;
-  console.log(this.times_shown);
 
   this.name = function() {
     return src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
@@ -80,6 +78,36 @@ function load_objects(name_array) {
     }
     choices.push(item);
   }
+}
+
+// When the app first loads, check for saved state variables
+function load_state() {
+  var last_shown = localStorage.last_shown;
+  if (last_shown) {
+    last_shown = JSON.parse(last_shown);
+    populate_images(last_shown);
+  } else {
+    populate_images();
+  }
+  var stored_clicks = localStorage.total_clicks;
+  if (stored_clicks && stored_clicks != 'NaN') {
+    total_clicks = stored_clicks;
+  }
+
+  var stored_round = localStorage.bonus_round;
+  if (stored_round) {
+    bonus_round = stored_round;
+  } else {
+    bonus_round = false;
+  }
+
+  var stored_display_state = localStorage.display_state;
+  if (stored_display_state) {
+    display_state = stored_display_state;
+  } else {
+    display_state = 0;
+  }
+  display_app();
 }
 
 function render_image_containers() {
@@ -116,12 +144,6 @@ function show_buttons() {
   gebi('button_div').style.visibility = 'visible';
 }
 
-function hide_buttons() {
-  gebi('button_div').style.visibility = 'visible';
-  gebi('button_div').setAttribute('class', 'flex_center');
-
-}
-
 function grey_out_buttons() {
   gebi('button_div').setAttribute('class', 'flex_center grey');
   gebi('results_button').removeEventListener('click', display_results);
@@ -144,36 +166,6 @@ function render_buttons() {
   button_div.appendChild(button);
   button_div.style.visibility = 'hidden';
   document.body.appendChild(button_div);
-}
-
-// When the app first loads, check for saved state variables
-function load_state() {
-  var last_shown = localStorage.last_shown;
-  if (last_shown) {
-    last_shown = JSON.parse(last_shown);
-    populate_images(last_shown);
-  } else {
-    populate_images();
-  }
-  var stored_clicks = localStorage.total_clicks;
-  if (stored_clicks && stored_clicks != 'NaN') {
-    total_clicks = stored_clicks;
-  }
-
-  var stored_round = localStorage.bonus_round;
-  if (stored_round) {
-    bonus_round = stored_round;
-  } else {
-    bonus_round = false;
-  }
-
-  var stored_display_state = localStorage.display_state;
-  if (stored_display_state) {
-    display_state = stored_display_state;
-  } else {
-    display_state = 0;
-  }
-  display_app();
 }
 
 function display_app(state) {
@@ -202,6 +194,7 @@ function populate_images(saved) {
 
     showing[i] = selection;
   }
+  localStorage.last_shown = JSON.stringify(showing);
 }
 
 // When a click is detected, log the vote and swap in a new pic
