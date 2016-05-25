@@ -143,7 +143,7 @@ function swap_pic(event) {
 }
 
 function check_finished() {
-  if ( total_clicks > 15 && bonus_round == false) {
+  if (total_clicks > 15 && bonus_round == false) {
     remove_pic_listeners();
     show_buttons();
   } else if (total_clicks > 23) {
@@ -163,45 +163,100 @@ function more_clicks() {
 
 function display_results() {
   grey_out_buttons();
-  var results_container = document.createElement('div');
-  results_container.setAttribute('id','results_container');
-  results_container.setAttribute('class', 'flex_center');
-  var text_results_div = document.createElement('div');
-  var histogram_div = document.createElement('div');
-  histogram_div.setAttribute('class', 'monospace');
-  var percentage_div = document.createElement('div');
-  // results_div.appendChild(document.createTextNode('Results go here.'));
-  for (var i = 0; i < choices.length; i++) {
-    var individual_result_div = document.createElement('div');
-    var build_string = choices[i].name + ': ';
-    build_string += choices[i].clicks + ' clicks out of ';
-    build_string += choices[i].times_shown + ' times shown.';
-    individual_result_div.appendChild(document.createTextNode(build_string));
-    text_results_div.appendChild(individual_result_div);
-    //show histogram in second div
-    individual_result_div = document.createElement('div');
-    build_string = '|';
-    for (var j = 0; j < choices[i].clicks; j++) {
-      build_string += '=';
-    }
-    for (var j = choices[i].clicks; j < choices[i].times_shown; j++) {
-      build_string += '&nbsp;';
-    }
-    build_string += '|';
-    individual_result_div.innerHTML = build_string;
-    histogram_div.appendChild(individual_result_div);
-    // Show percents in third div
-    individual_result_div = document.createElement('div');
-    build_string = Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
-    individual_result_div.appendChild(document.createTextNode(build_string));
-    percentage_div.appendChild(individual_result_div);
-  }
-  results_container.appendChild(text_results_div);
-  results_container.appendChild(histogram_div);
-  results_container.appendChild(percentage_div);
-  document.body.appendChild(results_container);
-  render_restart_button();
+
+  var canvas_container_div = document.createElement('div');
+  canvas_container_div.setAttribute('id', 'canvas_container');
+  var canvas = document.createElement('canvas');
+  canvas.setAttribute('id','result_chart');
+  canvas.setAttribute('width','100%');
+  canvas.setAttribute('height','25%');
+  canvas_container_div.appendChild(canvas);
+  document.body.appendChild(canvas_container_div);
   smooth_scroll_to(gebi('results_container'));
+
+  var label_array = [];
+  var clicks_array = [];
+  var times_shown_array = [];
+  for (var i = 0; i < choices.length; i++) {
+    label_array.push(choices[i].name);
+    clicks_array.push(choices[i].clicks);
+    times_shown_array.push(Math.floor(choices[i].clicks / choices[i].times_shown * 100));
+  }
+
+  var result_chart = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: label_array,
+      datasets: [{
+        yAxesGroup: '1',
+        label: '# of Votes',
+        data: clicks_array,
+        backgroundColor: 'rgba(50,50,50,0.9)'
+      },
+        {
+          yAxesGroup: '2',
+          type: 'line',
+          label: '% clicked',
+          data: times_shown_array,
+          backgroundColor: 'rgba(230,50,50,0.2)'
+        }
+      ]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          name: '1',
+          position: 'right',
+        }, {
+          name: '2',
+          position: 'left',
+          scaleLabel: {
+            labelString: 'Percent'
+          }
+        }]
+      }
+    }
+  });
+
+  // var results_container = document.createElement('div');
+  // results_container.setAttribute('id','results_container');
+  // results_container.setAttribute('class', 'flex_center');
+  // var text_results_div = document.createElement('div');
+  // var histogram_div = document.createElement('div');
+  // histogram_div.setAttribute('class', 'monospace');
+  // var percentage_div = document.createElement('div');
+  // // results_div.appendChild(document.createTextNode('Results go here.'));
+  // for (var i = 0; i < choices.length; i++) {
+  //   var individual_result_div = document.createElement('div');
+  //   var build_string = choices[i].name + ': ';
+  //   build_string += choices[i].clicks + ' clicks out of ';
+  //   build_string += choices[i].times_shown + ' times shown.';
+  //   individual_result_div.appendChild(document.createTextNode(build_string));
+  //   text_results_div.appendChild(individual_result_div);
+  //   //show histogram in second div
+  //   individual_result_div = document.createElement('div');
+  //   build_string = '|';
+  //   for (var j = 0; j < choices[i].clicks; j++) {
+  //     build_string += '=';
+  //   }
+  //   for (var j = choices[i].clicks; j < choices[i].times_shown; j++) {
+  //     build_string += '&nbsp;';
+  //   }
+  //   build_string += '|';
+  //   individual_result_div.innerHTML = build_string;
+  //   histogram_div.appendChild(individual_result_div);
+  //   // Show percents in third div
+  //   individual_result_div = document.createElement('div');
+  //   build_string = Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
+  //   individual_result_div.appendChild(document.createTextNode(build_string));
+  //   percentage_div.appendChild(individual_result_div);
+  // }
+  // results_container.appendChild(text_results_div);
+  // results_container.appendChild(histogram_div);
+  // results_container.appendChild(percentage_div);
+  // document.body.appendChild(results_container);
+  render_restart_button();
+  smooth_scroll_to(canvas_container_div);
 }
 
 function render_restart_button() {
@@ -217,7 +272,7 @@ function render_restart_button() {
 
 function restart() {
   document.body.removeChild(gebi('restart_button_div'));
-  document.body.removeChild(gebi('results_container'));
+  document.body.removeChild(gebi('canvas_container'));
   document.body.removeChild(gebi('button_div'));
   render_image_containers();
   render_buttons();
@@ -248,8 +303,8 @@ function gebi(name) {
 
 function smooth_scroll_to(element, last_jump) {
   if (element) {
-    var next_jump = window.scrollY + Math.ceil((element.offsetTop - window.scrollY) / 8 );
-    if ( next_jump != last_jump) {
+    var next_jump = window.scrollY + Math.ceil((element.offsetTop - window.scrollY) / 8);
+    if (next_jump != last_jump) {
       window.setTimeout(render_scroll, 50, next_jump, element);
     }
   }
