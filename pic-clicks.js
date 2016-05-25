@@ -165,6 +165,7 @@ function display_results() {
   grey_out_buttons();
 
   var canvas_container_div = document.createElement('div');
+  canvas_container_div.setAttribute('id', 'canvas_container');
   var canvas = document.createElement('canvas');
   canvas.setAttribute('id','result_chart');
   canvas.setAttribute('width','100%');
@@ -256,7 +257,7 @@ function render_restart_button() {
 
 function restart() {
   document.body.removeChild(gebi('restart_button_div'));
-  document.body.removeChild(gebi('results_container'));
+  document.body.removeChild(gebi('canvas_container'));
   document.body.removeChild(gebi('button_div'));
   render_image_containers();
   render_buttons();
