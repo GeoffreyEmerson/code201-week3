@@ -143,7 +143,7 @@ function swap_pic(event) {
 }
 
 function check_finished() {
-  if ( total_clicks > 15 && bonus_round == false) {
+  if (total_clicks > 15 && bonus_round == false) {
     remove_pic_listeners();
     show_buttons();
   } else if (total_clicks > 23) {
@@ -188,15 +188,30 @@ function display_results() {
     data: {
       labels: label_array,
       datasets: [{
+        yAxesGroup: '1',
         label: '# of Votes',
-        data: clicks_array
-      }]
+        data: clicks_array,
+        backgroundColor: 'rgba(50,50,50,0.9)'
+      },
+        {
+          yAxesGroup: '2',
+          type: 'line',
+          label: '% clicked',
+          data: times_shown_array,
+          backgroundColor: 'rgba(230,50,50,0.2)'
+        }
+      ]
     },
     options: {
       scales: {
         yAxes: [{
-          ticks: {
-            beginAtZero:true
+          name: '1',
+          position: 'right',
+        }, {
+          name: '2',
+          position: 'left',
+          scaleLabel: {
+            labelString: 'Percent'
           }
         }]
       }
@@ -288,8 +303,8 @@ function gebi(name) {
 
 function smooth_scroll_to(element, last_jump) {
   if (element) {
-    var next_jump = window.scrollY + Math.ceil((element.offsetTop - window.scrollY) / 8 );
-    if ( next_jump != last_jump) {
+    var next_jump = window.scrollY + Math.ceil((element.offsetTop - window.scrollY) / 8);
+    if (next_jump != last_jump) {
       window.setTimeout(render_scroll, 50, next_jump, element);
     }
   }
