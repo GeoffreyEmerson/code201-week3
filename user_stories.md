@@ -13,3 +13,7 @@
 ## Day 2 User Stories
 
 * As a client, I want the data to display in a slick looking chart, so that the plebs are impressed.
+
+## Day 3 User Stories
+
+* As a user, I want to be able to close the browser or lose power then have the app return to the same state when I come back to the web page so that I can pick up where I left off.
