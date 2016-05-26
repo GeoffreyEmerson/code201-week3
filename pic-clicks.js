@@ -129,7 +129,7 @@ function show_buttons() {
 }
 
 function grey_out_buttons() {
-  gebi('button_div').setAttribute('class', 'flex_center grey');
+  gebi('button_div').setAttribute('class', 'flex-center grey');
   gebi('results_button').removeEventListener('click', display_results);
   gebi('click_more_button').removeEventListener('click', more_clicks);
 }
@@ -139,7 +139,7 @@ function render_buttons() {
   if (!button_div) {
     button_div = document.createElement('div');
     button_div.setAttribute('id','button_div');
-    button_div.setAttribute('class','flex_center');
+    button_div.setAttribute('class','flex-center');
     var button = document.createElement('button');
     button.appendChild(document.createTextNode('Show Me The Results!'));
     button.setAttribute('id','results_button');
@@ -157,8 +157,6 @@ function render_buttons() {
 
 function display_app() {
   // State 0 is just the Heading, Instructions, and three images with listeners
-  console.log('State is: 0 or higher');
-  smooth_scroll_to(document.body);
   render_image_containers();
   var last_shown = localStorage.last_shown;
   if (last_shown) {
@@ -168,23 +166,29 @@ function display_app() {
     populate_images(); // This really only happens when the app is run for the first time.
   }
   render_buttons();
+  if (localStorage.state == 0) {
+    smooth_scroll_to(document.body);
+  }
   if (localStorage.state > 0) {
     // State 1 adds the display of the two choice buttons
     //  and disables listeners on the images
-    console.log('State is: 1 or higher');
     remove_pic_listeners();
     show_buttons();
   }
+  if (localStorage.state == 1) {
+    smooth_scroll_to(gebi('button_div'));
+  }
   if (localStorage.state > 1) {
   // State 2 greys out the buttons and restores the listeners on the images
-    console.log('State is: 2 or higher');
     set_pic_listeners();
     grey_out_buttons();
+  }
+  if (localStorage.state == 2) {
+    smooth_scroll_to(gebi('pic-container'));
   }
   if (localStorage.state > 2) {
     // State 3 removes the listeners on the images, displays the results chart,
     //  scrolls down to the chart, and adds a start over button with a listener
-    console.log('State is: 3');
     total_clicks = 0;
     save_total_clicks();
     localStorage.bonus_round = JSON.stringify(false);
@@ -192,6 +196,7 @@ function display_app() {
     grey_out_buttons();
     render_chart();
     render_restart_button();
+    smooth_scroll_to(gebi('results_container'));
   }
 }
 
@@ -203,7 +208,7 @@ function populate_images(saved) {
     if (saved) {
       selection = saved[i];
     } else {
-      selection = fresh_pic();
+      selection = fresh_pic(showing);
     }
     var img = gebi('pic' + i);
     img.setAttribute('src', 'img/' + choices[selection].src);
@@ -250,14 +255,13 @@ function display_results() {
 
 function render_chart() {
   var canvas_container_div = document.createElement('div');
-  canvas_container_div.setAttribute('id', 'canvas_container');
+  canvas_container_div.setAttribute('id', 'canvas-container');
   var canvas = document.createElement('canvas');
-  canvas.setAttribute('id','result_chart');
+  canvas.setAttribute('id','result-chart');
   canvas.setAttribute('width','100%');
   canvas.setAttribute('height','25%');
   canvas_container_div.appendChild(canvas);
   document.body.appendChild(canvas_container_div);
-  smooth_scroll_to(gebi('results_container'));
 
   var label_array = [];
   var clicks_array = [];
@@ -310,15 +314,15 @@ function render_restart_button() {
   button.appendChild(document.createTextNode('MOAR CLICK!'));
   button.addEventListener('click', restart);
   var button_div = document.createElement('div');
-  button_div.setAttribute('id','restart_button_div');
-  button_div.setAttribute('class','flex_center');
+  button_div.setAttribute('id','restart-button-div');
+  button_div.setAttribute('class','flex-center');
   button_div.appendChild(button);
   document.body.appendChild(button_div);
 }
 
 function restart() {
-  document.body.removeChild(gebi('restart_button_div'));
-  document.body.removeChild(gebi('canvas_container'));
+  document.body.removeChild(gebi('restart-button-div'));
+  document.body.removeChild(gebi('canvas-container'));
   document.body.removeChild(gebi('button_div'));
 
   localStorage.state = 0;
@@ -330,11 +334,19 @@ function save_total_clicks() {
   localStorage.total_clicks = total_clicks;
 }
 
-function fresh_pic() {
+function fresh_pic(taken) {
   if (0 == available_choices.length) {
     // when out of fresh pics, rest the choices available
     for (var i = 0; i < choices.length; i++) {
       available_choices.push(i);
+    }
+    for (var i = 0; i < taken.length; i++) {
+      var choice_to_remove = available_choices.indexOf(taken[i]);
+      if (choice_to_remove < 0) {
+        console.error('Uh, oh. This variable should never be missing.');
+      } else {
+        available_choices.splice(taken[i],1);
+      }
     }
   }
   var choice_index = Math.floor(Math.random() * available_choices.length);

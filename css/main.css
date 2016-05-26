@@ -72,14 +72,14 @@ button {
   }
 }
 
-.flex_center {
+.flex-center {
   width: 100%;
   padding:0;
   display: flex;
   justify-content: center;
 }
 
-.flex_center > button {
+.flex-center > button {
   margin: 30px;
 }
 
