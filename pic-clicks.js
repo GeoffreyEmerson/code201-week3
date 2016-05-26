@@ -13,7 +13,6 @@ var available_choices = [];
 
 // track how many times the user has made a choices
 var total_clicks = 0;
-var bonus_round;
 
 // list of given pics in the img directory
 var pics_array = ['Arya-Stark.jpg',
@@ -34,12 +33,8 @@ var pics_array = ['Arya-Stark.jpg',
 //start the app here
 load_objects(pics_array);
 preload_images(choices);
-render_image_containers(); // the container div is in the html and is never removed, only cleared on restart
 
 load_state();
-
-// these should probably go into load_state
-render_buttons();
 
 function Item(src, clicks, times_shown) {
   this.src = src;
@@ -82,32 +77,21 @@ function load_objects(name_array) {
 
 // When the app first loads, check for saved state variables
 function load_state() {
-  var last_shown = localStorage.last_shown;
-  if (last_shown) {
-    last_shown = JSON.parse(last_shown);
-    populate_images(last_shown);
-  } else {
-    populate_images();
+  var stored_display_state = localStorage.state;
+  if (!stored_display_state || JSON.parse(stored_display_state) < 0 || JSON.parse(stored_display_state) > 3) {
+    localStorage.state = 0;
   }
+  display_app();
+
   var stored_clicks = localStorage.total_clicks;
   if (stored_clicks && stored_clicks != 'NaN') {
     total_clicks = stored_clicks;
   }
 
   var stored_round = localStorage.bonus_round;
-  if (stored_round) {
-    bonus_round = stored_round;
-  } else {
-    bonus_round = false;
+  if (!stored_round) {
+    localStorage.bonus_round = JSON.stringify(false);
   }
-
-  var stored_display_state = localStorage.display_state;
-  if (stored_display_state) {
-    display_state = stored_display_state;
-  } else {
-    display_state = 0;
-  }
-  display_app();
 }
 
 function render_image_containers() {
@@ -151,40 +135,75 @@ function grey_out_buttons() {
 }
 
 function render_buttons() {
-  var button_div = document.createElement('div');
-  button_div.setAttribute('id','button_div');
-  button_div.setAttribute('class','flex_center');
-  var button = document.createElement('button');
-  button.appendChild(document.createTextNode('Show Me The Results!'));
-  button.setAttribute('id','results_button');
-  button.addEventListener('click', display_results);
-  button_div.appendChild(button);
-  button = document.createElement('button');
-  button.appendChild(document.createTextNode('I Want to Click More!'));
-  button.setAttribute('id','click_more_button');
-  button.addEventListener('click', more_clicks);
-  button_div.appendChild(button);
-  button_div.style.visibility = 'hidden';
-  document.body.appendChild(button_div);
+  var button_div = gebi('button_div');
+  if (!button_div) {
+    button_div = document.createElement('div');
+    button_div.setAttribute('id','button_div');
+    button_div.setAttribute('class','flex_center');
+    var button = document.createElement('button');
+    button.appendChild(document.createTextNode('Show Me The Results!'));
+    button.setAttribute('id','results_button');
+    button.addEventListener('click', display_results);
+    button_div.appendChild(button);
+    button = document.createElement('button');
+    button.appendChild(document.createTextNode('I Want to Click More!'));
+    button.setAttribute('id','click_more_button');
+    button.addEventListener('click', more_clicks);
+    button_div.appendChild(button);
+    button_div.style.visibility = 'hidden';
+    document.body.appendChild(button_div);
+  }
 }
 
-function display_app(state) {
-  // State 0 is just the Heading, Instructions, and three images
-
-  // State 1 adds the display of the two choice buttons
-
-  // State 2
-
+function display_app() {
+  // State 0 is just the Heading, Instructions, and three images with listeners
+  console.log('State is: 0 or higher');
+  smooth_scroll_to(document.body);
+  render_image_containers();
+  var last_shown = localStorage.last_shown;
+  if (last_shown) {
+    last_shown = JSON.parse(last_shown);
+    populate_images(last_shown);
+  } else {
+    populate_images(); // This really only happens when the app is run for the first time.
+  }
+  render_buttons();
+  if (localStorage.state > 0) {
+    // State 1 adds the display of the two choice buttons
+    //  and disables listeners on the images
+    console.log('State is: 1 or higher');
+    remove_pic_listeners();
+    show_buttons();
+  }
+  if (localStorage.state > 1) {
+  // State 2 greys out the buttons and restores the listeners on the images
+    console.log('State is: 2 or higher');
+    set_pic_listeners();
+    grey_out_buttons();
+  }
+  if (localStorage.state > 2) {
+    // State 3 removes the listeners on the images, displays the results chart,
+    //  scrolls down to the chart, and adds a start over button with a listener
+    console.log('State is: 3');
+    total_clicks = 0;
+    save_total_clicks();
+    localStorage.bonus_round = JSON.stringify(false);
+    remove_pic_listeners();
+    grey_out_buttons();
+    render_chart();
+    render_restart_button();
+  }
 }
 
 // display 3 fresh images
 function populate_images(saved) {
   var showing = [];
   for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
+    var selection;
     if (saved) {
       selection = saved[i];
     } else {
-      var selection = fresh_pic();
+      selection = fresh_pic();
     }
     var img = gebi('pic' + i);
     img.setAttribute('src', 'img/' + choices[selection].src);
@@ -206,27 +225,30 @@ function swap_pic(event) {
 }
 
 function check_finished() {
-  if (total_clicks > 15 && bonus_round == false) {
-    remove_pic_listeners();
-    show_buttons();
+  if (total_clicks > 15 && JSON.parse(localStorage.bonus_round) == false) {
+    localStorage.state = 1;
+    display_app();
   } else if (total_clicks > 23) {
-    remove_pic_listeners();
-    grey_out_buttons();
-    display_results();
+    localStorage.state = 3;
+    display_app();
   } else {
     populate_images();
   }
 }
 
 function more_clicks() {
-  bonus_round = true;
-  set_pic_listeners();
-  grey_out_buttons();
+  localStorage.bonus_round = JSON.stringify(true);
+  localStorage.state = 2;
+  display_app();
+  populate_images(); // Needed for a new set of images to appear with the button click.
 }
 
 function display_results() {
-  grey_out_buttons();
+  localStorage.state = 3;
+  display_app();
+}
 
+function render_chart() {
   var canvas_container_div = document.createElement('div');
   canvas_container_div.setAttribute('id', 'canvas_container');
   var canvas = document.createElement('canvas');
@@ -280,8 +302,6 @@ function display_results() {
       }
     }
   });
-
-  render_restart_button();
   smooth_scroll_to(canvas_container_div);
 }
 
@@ -300,13 +320,10 @@ function restart() {
   document.body.removeChild(gebi('restart_button_div'));
   document.body.removeChild(gebi('canvas_container'));
   document.body.removeChild(gebi('button_div'));
-  render_image_containers();
-  render_buttons();
-  total_clicks = 0;
-  save_total_clicks();
-  bonus_round = false;
-  populate_images();
-  smooth_scroll_to(document.body);
+
+  localStorage.state = 0;
+  display_app();
+  populate_images(); // Needed because the pics will not update otherwise.
 }
 
 function save_total_clicks() {
