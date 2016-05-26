@@ -13,7 +13,6 @@ var available_choices = [];
 
 // track how many times the user has made a choices
 var total_clicks = 0;
-var bonus_round = false;
 
 // list of given pics in the img directory
 var pics_array = ['Arya-Stark.jpg',
@@ -31,31 +30,67 @@ var pics_array = ['Arya-Stark.jpg',
                   'Tommen-Baratheon.jpg',
                   'Tyrion-Lannister.jpg'];
 
-//start the game here
+//start the app here
 load_objects(pics_array);
-render_image_containers();
-render_buttons();
-populate_images(pics_array);
+preload_images(choices);
 
-function Item(src) {
-  this.src = 'img/' + src;
-  this.name = src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
-  this.clicks = 0;
-  this.times_shown = 0;
+load_state();
+
+function Item(src, clicks, times_shown) {
+  this.src = src;
+  this.clicks = clicks || 0;
+  this.times_shown = times_shown || 0;
+
+  this.name = function() {
+    return src.slice(0,src.lastIndexOf('.')).replace(/-/g,' ');
+  };
+
+  this.save_state = function() {
+    localStorage[this.src] = JSON.stringify(this);
+  };
 
   this.add_click = function() {
     this.clicks++;
+    this.save_state();
   };
 
   this.increment_times_shown = function() {
     this.times_shown++;
+    this.save_state();
   };
+
+  this.save_state();
 }
 
 function load_objects(name_array) {
   for (var i = 0; i < name_array.length; i++) {
-    var item = new Item(name_array[i]);
+    var temp_object_raw = localStorage[name_array[i]];
+    if (temp_object_raw) {
+      var temp_object = JSON.parse(temp_object_raw);
+      var item = new Item(temp_object.src,temp_object.clicks,temp_object.times_shown);
+    } else {
+      var item = new Item(name_array[i]);
+    }
     choices.push(item);
+  }
+}
+
+// When the app first loads, check for saved state variables
+function load_state() {
+  var stored_display_state = localStorage.state;
+  if (!stored_display_state || JSON.parse(stored_display_state) < 0 || JSON.parse(stored_display_state) > 3) {
+    localStorage.state = 0;
+  }
+  display_app();
+
+  var stored_clicks = localStorage.total_clicks;
+  if (stored_clicks && stored_clicks != 'NaN') {
+    total_clicks = stored_clicks;
+  }
+
+  var stored_round = localStorage.bonus_round;
+  if (!stored_round) {
+    localStorage.bonus_round = JSON.stringify(false);
   }
 }
 
@@ -93,92 +128,146 @@ function show_buttons() {
   gebi('button_div').style.visibility = 'visible';
 }
 
-function hide_buttons() {
-  gebi('button_div').style.visibility = 'visible';
-  gebi('button_div').setAttribute('class', 'flex_center');
-
-}
-
 function grey_out_buttons() {
-  gebi('button_div').setAttribute('class', 'flex_center grey');
+  gebi('button_div').setAttribute('class', 'flex-center grey');
   gebi('results_button').removeEventListener('click', display_results);
   gebi('click_more_button').removeEventListener('click', more_clicks);
 }
 
 function render_buttons() {
-  var button_div = document.createElement('div');
-  button_div.setAttribute('id','button_div');
-  button_div.setAttribute('class','flex_center');
-  var button = document.createElement('button');
-  button.appendChild(document.createTextNode('Show Me The Results!'));
-  button.setAttribute('id','results_button');
-  button.addEventListener('click', display_results);
-  button_div.appendChild(button);
-  button = document.createElement('button');
-  button.appendChild(document.createTextNode('I Want to Click More!'));
-  button.setAttribute('id','click_more_button');
-  button.addEventListener('click', more_clicks);
-  button_div.appendChild(button);
-  button_div.style.visibility = 'hidden';
-  document.body.appendChild(button_div);
+  var button_div = gebi('button_div');
+  if (!button_div) {
+    button_div = document.createElement('div');
+    button_div.setAttribute('id','button_div');
+    button_div.setAttribute('class','flex-center');
+    var button = document.createElement('button');
+    button.appendChild(document.createTextNode('Show Me The Results!'));
+    button.setAttribute('id','results_button');
+    button.addEventListener('click', display_results);
+    button_div.appendChild(button);
+    button = document.createElement('button');
+    button.appendChild(document.createTextNode('I Want to Click More!'));
+    button.setAttribute('id','click_more_button');
+    button.addEventListener('click', more_clicks);
+    button_div.appendChild(button);
+    button_div.style.visibility = 'hidden';
+    document.body.appendChild(button_div);
+  }
 }
 
-function populate_images() {
-  // now make random selections for the initial 4 images
+function display_app() {
+  // State 0 is just the Heading, Instructions, and three images with listeners
+  render_image_containers();
+  var last_shown = localStorage.last_shown;
+  if (last_shown) {
+    last_shown = JSON.parse(last_shown);
+    populate_images(last_shown);
+  } else {
+    populate_images(); // This really only happens when the app is run for the first time.
+  }
+  render_buttons();
+  if (localStorage.state == 0) {
+    smooth_scroll_to(document.body);
+  }
+  if (localStorage.state > 0) {
+    // State 1 adds the display of the two choice buttons
+    //  and disables listeners on the images
+    remove_pic_listeners();
+    show_buttons();
+  }
+  if (localStorage.state == 1) {
+    smooth_scroll_to(gebi('button_div'));
+  }
+  if (localStorage.state > 1) {
+  // State 2 greys out the buttons and restores the listeners on the images
+    set_pic_listeners();
+    grey_out_buttons();
+  }
+  if (localStorage.state == 2) {
+    smooth_scroll_to(gebi('pic-container'));
+  }
+  if (localStorage.state > 2) {
+    // State 3 removes the listeners on the images, displays the results chart,
+    //  scrolls down to the chart, and adds a start over button with a listener
+    total_clicks = 0;
+    save_total_clicks();
+    localStorage.bonus_round = JSON.stringify(false);
+    remove_pic_listeners();
+    grey_out_buttons();
+    render_chart();
+    render_restart_button();
+    smooth_scroll_to(gebi('results_container'));
+  }
+}
+
+// display 3 fresh images
+function populate_images(saved) {
+  var showing = [];
   for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
-    var selection = fresh_pic();
+    var selection;
+    if (saved) {
+      selection = saved[i];
+    } else {
+      selection = fresh_pic(showing);
+    }
     var img = gebi('pic' + i);
-    img.setAttribute('src', choices[selection].src);
+    img.setAttribute('src', 'img/' + choices[selection].src);
     img.setAttribute('choice', selection);
     var caption = gebi('vote' + i);
-    caption.textContent = choices[selection].name;
+    caption.textContent = choices[selection].name();
+
+    showing[i] = selection;
   }
+  localStorage.last_shown = JSON.stringify(showing);
 }
 
 // When a click is detected, log the vote and swap in a new pic
 function swap_pic(event) {
   total_clicks++;
+  save_total_clicks();
   choices[event.target.attributes[3].value].add_click();
   check_finished();
 }
 
 function check_finished() {
-  if (total_clicks > 15 && bonus_round == false) {
-    remove_pic_listeners();
-    show_buttons();
+  if (total_clicks > 15 && JSON.parse(localStorage.bonus_round) == false) {
+    localStorage.state = 1;
+    display_app();
   } else if (total_clicks > 23) {
-    remove_pic_listeners();
-    grey_out_buttons();
-    display_results();
+    localStorage.state = 3;
+    display_app();
   } else {
     populate_images();
   }
 }
 
 function more_clicks() {
-  bonus_round = true;
-  set_pic_listeners();
-  grey_out_buttons();
+  localStorage.bonus_round = JSON.stringify(true);
+  localStorage.state = 2;
+  display_app();
+  populate_images(); // Needed for a new set of images to appear with the button click.
 }
 
 function display_results() {
-  grey_out_buttons();
+  localStorage.state = 3;
+  display_app();
+}
 
+function render_chart() {
   var canvas_container_div = document.createElement('div');
-  canvas_container_div.setAttribute('id', 'canvas_container');
+  canvas_container_div.setAttribute('id', 'canvas-container');
   var canvas = document.createElement('canvas');
-  canvas.setAttribute('id','result_chart');
+  canvas.setAttribute('id','result-chart');
   canvas.setAttribute('width','100%');
   canvas.setAttribute('height','25%');
   canvas_container_div.appendChild(canvas);
   document.body.appendChild(canvas_container_div);
-  smooth_scroll_to(gebi('results_container'));
 
   var label_array = [];
   var clicks_array = [];
   var times_shown_array = [];
   for (var i = 0; i < choices.length; i++) {
-    label_array.push(choices[i].name);
+    label_array.push(choices[i].name());
     clicks_array.push(choices[i].clicks);
     times_shown_array.push(Math.floor(choices[i].clicks / choices[i].times_shown * 100));
   }
@@ -217,45 +306,6 @@ function display_results() {
       }
     }
   });
-
-  // var results_container = document.createElement('div');
-  // results_container.setAttribute('id','results_container');
-  // results_container.setAttribute('class', 'flex_center');
-  // var text_results_div = document.createElement('div');
-  // var histogram_div = document.createElement('div');
-  // histogram_div.setAttribute('class', 'monospace');
-  // var percentage_div = document.createElement('div');
-  // // results_div.appendChild(document.createTextNode('Results go here.'));
-  // for (var i = 0; i < choices.length; i++) {
-  //   var individual_result_div = document.createElement('div');
-  //   var build_string = choices[i].name + ': ';
-  //   build_string += choices[i].clicks + ' clicks out of ';
-  //   build_string += choices[i].times_shown + ' times shown.';
-  //   individual_result_div.appendChild(document.createTextNode(build_string));
-  //   text_results_div.appendChild(individual_result_div);
-  //   //show histogram in second div
-  //   individual_result_div = document.createElement('div');
-  //   build_string = '|';
-  //   for (var j = 0; j < choices[i].clicks; j++) {
-  //     build_string += '=';
-  //   }
-  //   for (var j = choices[i].clicks; j < choices[i].times_shown; j++) {
-  //     build_string += '&nbsp;';
-  //   }
-  //   build_string += '|';
-  //   individual_result_div.innerHTML = build_string;
-  //   histogram_div.appendChild(individual_result_div);
-  //   // Show percents in third div
-  //   individual_result_div = document.createElement('div');
-  //   build_string = Math.floor(choices[i].clicks / choices[i].times_shown * 100) + '%';
-  //   individual_result_div.appendChild(document.createTextNode(build_string));
-  //   percentage_div.appendChild(individual_result_div);
-  // }
-  // results_container.appendChild(text_results_div);
-  // results_container.appendChild(histogram_div);
-  // results_container.appendChild(percentage_div);
-  // document.body.appendChild(results_container);
-  render_restart_button();
   smooth_scroll_to(canvas_container_div);
 }
 
@@ -264,29 +314,39 @@ function render_restart_button() {
   button.appendChild(document.createTextNode('MOAR CLICK!'));
   button.addEventListener('click', restart);
   var button_div = document.createElement('div');
-  button_div.setAttribute('id','restart_button_div');
-  button_div.setAttribute('class','flex_center');
+  button_div.setAttribute('id','restart-button-div');
+  button_div.setAttribute('class','flex-center');
   button_div.appendChild(button);
   document.body.appendChild(button_div);
 }
 
 function restart() {
-  document.body.removeChild(gebi('restart_button_div'));
-  document.body.removeChild(gebi('canvas_container'));
+  document.body.removeChild(gebi('restart-button-div'));
+  document.body.removeChild(gebi('canvas-container'));
   document.body.removeChild(gebi('button_div'));
-  render_image_containers();
-  render_buttons();
-  total_clicks = 0;
-  bonus_round = false;
-  populate_images(pics_array);
-  smooth_scroll_to(document.body);
+
+  localStorage.state = 0;
+  display_app();
+  populate_images(); // Needed because the pics will not update otherwise.
 }
 
-function fresh_pic() {
+function save_total_clicks() {
+  localStorage.total_clicks = total_clicks;
+}
+
+function fresh_pic(taken) {
   if (0 == available_choices.length) {
     // when out of fresh pics, rest the choices available
     for (var i = 0; i < choices.length; i++) {
       available_choices.push(i);
+    }
+    for (var i = 0; i < taken.length; i++) {
+      var choice_to_remove = available_choices.indexOf(taken[i]);
+      if (choice_to_remove < 0) {
+        console.error('Uh, oh. This variable should never be missing.');
+      } else {
+        available_choices.splice(taken[i],1);
+      }
     }
   }
   var choice_index = Math.floor(Math.random() * available_choices.length);
@@ -296,9 +356,16 @@ function fresh_pic() {
   return choice;
 }
 
+function preload_images(obj_array) {
+  for (var i = 0; i < obj_array.length; i++) {
+    var temp_image = new Image();
+    temp_image.src = 'img/' + obj_array[i].src;
+  }
+}
+
 // utility functions
-function gebi(name) {
-  return document.getElementById(name);
+function gebi(target_id) {
+  return document.getElementById(target_id);
 }
 
 function smooth_scroll_to(element, last_jump) {

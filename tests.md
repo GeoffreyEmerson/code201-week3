@@ -28,3 +28,17 @@
   - The chart displays the proper results.
 5. Load the app, then vote 16 times, then click the button labeled "I want to click more!" and vote 8 more times. Verify:
   - The chart displays the proper results.
+
+## Day 3 tests
+
+
+1. Load the app. Refresh the page or close and re-open the browser and return to page. Verify:
+  - The same pictures show before and after refreshing.
+2. Load the app, vote fewer than 16 times. Refresh page. Verify:
+  - Only the remaining votes are allowed, and not another full 16.
+3. Load the app, then vote 16 times. Refresh the page. Verify:
+  - The two buttons display and are active.
+4. Load the app, then vote 16 times, then click the button labeled "Show me the results!" Refresh the page. Verify:
+  - The chart still displays the same results as before the page refresh.
+5. Load the app, then vote 16 times, then click the button labeled "I want to click more!" and vote less than 8 times. Refresh the page. Verify:
+  - Only the remaining votes are allowed, and not another full 8 or 16.

@@ -72,17 +72,16 @@ button {
   }
 }
 
-.flex_center {
+.flex-center {
   width: 100%;
   padding:0;
   display: flex;
   justify-content: center;
 }
 
-.flex_center > button {
+.flex-center > button {
   margin: 30px;
 }
-
 
 .grey > button, .grey > button:hover, .grey > button:active {
   background-color: #ddd;
@@ -101,4 +100,13 @@ button:active {
 
 button:focus {
   outline: none;
+}
+
+/* Remove highlighting */
+::selection {
+  background-color: white;
+}
+
+::-moz-selection {
+  background: white;
 }
