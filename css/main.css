@@ -19,8 +19,8 @@ h1 {
   font-family: 'Game of Thrones', monospace;
   text-transform: uppercase;
   text-align: center;
-  margin-left: -500%;
-  margin-right: -500%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 p, #pic-container, #button_div, #canvas-container, #restart-button-div {
@@ -194,18 +194,26 @@ button:focus {
 @keyframes bigheading {
   0% {
     font-size: 400px;
+    margin-left: -500%;
+    margin-right: -500%;
   }
   100% {
     font-size: 62px;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
 @-webkit-keyframes bigheading {
   0% {
     font-size: 400px;
+    margin-left: -500%;
+    margin-right: -500%;
   }
   100% {
     font-size: 62px;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
@@ -265,13 +273,13 @@ button:focus {
 
 @keyframes borderanimation {
   0% {
-    box-shadow: 0px 0px 10px #ff0000;
+    box-shadow: 0px 0px 50px #ff0000;
   }
   50% {
     box-shadow: 0px 0px 0px #ff0000;
   }
   100% {
-    box-shadow: 0px 0px 10px #ff0000;
+    box-shadow: 0px 0px 50px #ff0000;
   }
 }
 
