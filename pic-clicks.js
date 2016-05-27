@@ -312,16 +312,27 @@ function render_chart() {
 function render_restart_button() {
   var button = document.createElement('button');
   button.appendChild(document.createTextNode('MOAR CLICK!'));
+  button.setAttribute('id','restart-button');
   button.addEventListener('click', restart);
   var button_div = document.createElement('div');
   button_div.setAttribute('id','restart-button-div');
   button_div.setAttribute('class','flex-center');
   button_div.appendChild(button);
   document.body.appendChild(button_div);
+
+  button = document.createElement('button');
+  button.appendChild(document.createTextNode('OH NOES, SPOILERZ!'));
+  button.setAttribute('id','spoilers-button');
+  // button.addEventListener('click', video_modal);
+  button_div = document.createElement('div');
+  button_div.setAttribute('id','spoiler-button-div');
+  button_div.appendChild(button);
+  document.body.appendChild(button_div);
 }
 
 function restart() {
   document.body.removeChild(gebi('restart-button-div'));
+  document.body.removeChild(gebi('spoiler-button-div'));
   document.body.removeChild(gebi('canvas-container'));
   document.body.removeChild(gebi('button_div'));
 

@@ -1,6 +1,47 @@
+@font-face {
+    font-family: 'Game of Thrones';
+    src: url('../fonts/game-of-thrones.ttf');
+}
+
 body {
+  background-image: url('../img/got-background1.jpg');
+  background-position: top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: #222;
+
   width: 80%;
   margin: 40px auto;
+}
+
+h1 {
+  font-size: 20px;
+  font-family: 'Game of Thrones', monospace;
+  text-transform: uppercase;
+  text-align: center;
+  margin-left: -500%;
+  margin-right: -500%;
+}
+
+p, #pic-container, #button_div, #canvas-container, #restart-button-div {
+  animation: 2s fadeinstuff;
+  -webkit-animation: 2s fadeinstuff;
+  -moz-animation: 2s fadeinstuff;
+}
+
+#spoilers-button {
+  animation: 1s borderanimation infinite;
+  -webkit-animation: 1s borderanimation infinite;
+  -moz-animation: 1s borderanimation infinite;
+}
+
+#spoiler-button-div {
+  float: right;
+  margin: -130px 100px 0 0;
+
+  animation: 5s delayedfadein;
+  -webkit-animation: 5s delayedfadein;
+  -moz-animation: 5s delayedfadein;
 }
 
 #pic-container {
@@ -8,8 +49,13 @@ body {
   justify-content: space-around;
 }
 
-#results_container > div {
+/*#results_container > div {
   margin: 10px;
+}*/
+
+#canvas-container {
+  background-color: white;
+  border: 2px black solid;
 }
 
 .monospace {
@@ -20,6 +66,8 @@ body {
 .headshot {
   height: auto;
   max-width: 100px;
+  margin: 10px;
+  border: 2px black solid;
 }
 
 figcaption {
@@ -51,6 +99,10 @@ button {
     box-shadow: 0px 0px 15px 0px #777;
     font-size: 15px;
   }
+
+  h1 {
+    font-size: 24px;
+  }
 }
 
 @media (min-width:900px) {
@@ -70,6 +122,23 @@ button {
     box-shadow: 0px 0px 20px 0px #777;
     font-size: 20px;
   }
+
+  #restart-button {
+    box-shadow: 0px 0px 20px 0px #000;
+  }
+
+  #spoilers-button {
+    height: 110px;
+    width: 110px;
+  }
+
+  h1 {
+    font-size: 42px;
+
+    animation: 2s bigheading;
+    -webkit-animation: 2s bigheading;
+    -moz-animation: 2s bigheading;
+  }
 }
 
 .flex-center {
@@ -86,7 +155,7 @@ button {
 .grey > button, .grey > button:hover, .grey > button:active {
   background-color: #ddd;
   color: #eee;
-  box-shadow: 0px 0px 20px 0px #bbb;
+  box-shadow: 0px 0px 0px 0px #fff;
 }
 
 button:hover {
@@ -109,4 +178,104 @@ button:focus {
 
 ::-moz-selection {
   background: white;
+}
+{
+
+}
+/* Animations */
+
+@keyframes bigheading {
+  0% {
+    font-size: 300px;
+  }
+  100% {
+    font-size: 42px;
+  }
+}
+
+@-webkit-keyframes bigheading {
+  0% {
+    font-size: 300px;
+  }
+  100% {
+    font-size: 42px;
+  }
+}
+
+@keyframes fadeinstuff {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadeinstuff {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes delayedfadein {
+  0% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  80% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  100% {
+    opacity: 1;
+    margin-right: 100px;
+  }
+}
+
+@-webkit-keyframes delayedfadein {
+  0% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  80% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  100% {
+    opacity: 1;
+    margin-right: 100px;
+  }
+}
+
+@keyframes borderanimation {
+  0% {
+    box-shadow: 0px 0px 10px #ff0000;
+  }
+  50% {
+    box-shadow: 0px 0px 0px #ff0000;
+  }
+  100% {
+    box-shadow: 0px 0px 10px #ff0000;
+  }
+}
+
+@-webkit-keyframes borderanimation {
+  0% {
+    box-shadow: 0px 0px 10px #ff0000;
+  }
+  50% {
+    box-shadow: 0px 0px 0px #ff0000;
+  }
+  100% {
+    box-shadow: 0px 0px 10px #ff0000;
+  }
 }
