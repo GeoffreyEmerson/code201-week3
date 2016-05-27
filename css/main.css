@@ -4,7 +4,7 @@
 }
 
 body {
-  background-image: url('../img/got-background1.jpg');
+  background-image: url('../img/got-background.jpg');
   background-position: top;
   background-attachment: fixed;
   background-repeat: no-repeat;
@@ -27,6 +27,13 @@ p, #pic-container, #button_div, #canvas-container, #restart-button-div {
   animation: 2s fadeinstuff;
   -webkit-animation: 2s fadeinstuff;
   -moz-animation: 2s fadeinstuff;
+}
+
+p {
+  font-family: fantasy;
+  font-size: 22px;
+  width: 80%;
+  margin:auto;
 }
 
 #spoilers-button {
@@ -133,7 +140,7 @@ button {
   }
 
   h1 {
-    font-size: 42px;
+    font-size: 62px;
 
     animation: 2s bigheading;
     -webkit-animation: 2s bigheading;
@@ -186,19 +193,19 @@ button:focus {
 
 @keyframes bigheading {
   0% {
-    font-size: 300px;
+    font-size: 400px;
   }
   100% {
-    font-size: 42px;
+    font-size: 62px;
   }
 }
 
 @-webkit-keyframes bigheading {
   0% {
-    font-size: 300px;
+    font-size: 400px;
   }
   100% {
-    font-size: 42px;
+    font-size: 62px;
   }
 }
 
