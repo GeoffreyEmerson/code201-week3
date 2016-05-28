@@ -17,3 +17,9 @@
 ## Day 3 User Stories
 
 * As a user, I want to be able to close the browser or lose power then have the app return to the same state when I come back to the web page so that I can pick up where I left off.
+
+## Day 4 User Stories
+
+* As a client, I want the page to look nice so that users will be tricked into thinking this is a professional operation.
+* As a user, I want to see a video play on the page so that I will be temporarily distracted from the futility of existence.
+* As a developer, I want to complete all of today's technical requirements so that I will get full points when I turn in this project.

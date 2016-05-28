@@ -42,3 +42,19 @@
   - The chart still displays the same results as before the page refresh.
 5. Load the app, then vote 16 times, then click the button labeled "I want to click more!" and vote less than 8 times. Refresh the page. Verify:
   - Only the remaining votes are allowed, and not another full 8 or 16.
+
+## Day 4 tests
+
+1. Load the app. Verify:
+  - The page heading animates from larger than the screen width to fitting above the page content.
+  - The instructions and first set of images fades in as the heading zooms in.
+2. Load the app, then vote 16 times, then click the button labeled "Show me the results!" Verify:
+  - The statistics chart and app restart button fade into view.
+  - After a few seconds, another button slides in from the bottom right of the screen.
+3. Load the app, then vote 16 times, then click the button labeled "Show me the results!" Then click on the button labeled "Moar click!" Verify:
+  - The page scrolls back to the top of the app by itself.
+4. Load the app, then press the 'c' key. Verify:
+  - An overlay appears with a video available for viewing in the middle of the screen.
+5. Load the app, then vote 16 times, then click the button labeled "Show me the results!" Then click on the button labeled "Oh noes, spoilerz!" Verify:
+  - An overlay appears with a video available for viewing in the middle of the screen.
+  

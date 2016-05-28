@@ -33,7 +33,7 @@ var pics_array = ['Arya-Stark.jpg',
 //start the app here
 load_objects(pics_array);
 preload_images(choices);
-
+prepare_modal_div();
 load_state();
 
 function Item(src, clicks, times_shown) {
@@ -166,6 +166,7 @@ function display_app() {
     populate_images(); // This really only happens when the app is run for the first time.
   }
   render_buttons();
+  easter_egg();
   if (localStorage.state == 0) {
     smooth_scroll_to(document.body);
   }
@@ -196,6 +197,7 @@ function display_app() {
     grey_out_buttons();
     render_chart();
     render_restart_button();
+    set_up_modal_listeners();
     smooth_scroll_to(gebi('results_container'));
   }
 }
@@ -312,22 +314,76 @@ function render_chart() {
 function render_restart_button() {
   var button = document.createElement('button');
   button.appendChild(document.createTextNode('MOAR CLICK!'));
+  button.setAttribute('id','restart-button');
   button.addEventListener('click', restart);
   var button_div = document.createElement('div');
   button_div.setAttribute('id','restart-button-div');
   button_div.setAttribute('class','flex-center');
   button_div.appendChild(button);
   document.body.appendChild(button_div);
+
+  button = document.createElement('button');
+  button.appendChild(document.createTextNode('OH NOES, SPOILERZ!'));
+  button.setAttribute('id','spoilers-button');
+  // button.addEventListener('click', video_modal);
+  button_div = document.createElement('div');
+  button_div.setAttribute('id','spoiler-button-div');
+  button_div.appendChild(button);
+  document.body.appendChild(button_div);
 }
 
 function restart() {
   document.body.removeChild(gebi('restart-button-div'));
+  document.body.removeChild(gebi('spoiler-button-div'));
   document.body.removeChild(gebi('canvas-container'));
   document.body.removeChild(gebi('button_div'));
 
   localStorage.state = 0;
   display_app();
   populate_images(); // Needed because the pics will not update otherwise.
+}
+
+function prepare_modal_div() {
+  var video_div = document.createElement('div');
+  video_div.setAttribute('class','modal-content');
+  video_div.innerHTML = '<iframe width="853" height="480" src="https://www.youtube.com/embed/kMI_HBO5FOM?rel=0&amp;showinfo=0&amp;enablejsapi=1" frameborder="0" allowfullscreen></iframe>';
+
+  // // if the video becomes local, use this code
+  // var video = document.createElement('video');
+  // video.setAttribute('controls','controls');
+  // video.setAttribute('src','video.mp4');
+  // video_div.appendChild(video);
+  // modal div
+  var modal_div = document.createElement('div');
+  modal_div.setAttribute('class', 'modal');
+  modal_div.setAttribute('id', 'spoilers-modal');
+  modal_div.appendChild(video_div);
+  // append modal div to output_div
+  document.body.appendChild(modal_div);
+}
+
+function set_up_modal_listeners() {
+  // Get the button that opens the modal
+  var btn = document.getElementById('spoilers-button');
+
+  // When the user clicks the button, open the modal
+  btn.addEventListener('click', display_modal);
+}
+
+function display_modal() {
+  var modal = document.getElementById('spoilers-modal');
+  modal.style.display = 'block';
+  // When the user clicks anywhere outside of the modal, close it
+  window.addEventListener('click', hide_modal);
+}
+
+function hide_modal(event) {
+  var modal = document.getElementById('spoilers-modal');
+  if (event.target == modal) {
+    modal.style.display = 'none';
+    var iframe = document.getElementsByTagName('iframe')[0].contentWindow;
+    iframe.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+  }
 }
 
 function save_total_clicks() {
@@ -380,4 +436,13 @@ function smooth_scroll_to(element, last_jump) {
 function render_scroll(jump_location, element) {
   window.scrollTo(0, jump_location);
   smooth_scroll_to(element, jump_location);
+}
+
+function easter_egg() {
+  document.onkeydown = function(e) {
+    if (e.code == 'KeyC') {
+      display_modal();
+    }
+  };
+
 }
