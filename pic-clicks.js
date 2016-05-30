@@ -34,6 +34,8 @@ var pics_array = ['Arya-Stark.jpg',
 load_objects(pics_array);
 preload_images(choices);
 prepare_modal_div();
+render_heading();
+render_instructions();
 load_state();
 
 function Item(src, clicks, times_shown) {
@@ -60,6 +62,21 @@ function Item(src, clicks, times_shown) {
   };
 
   this.save_state();
+}
+
+function render_heading() {
+  var h1 = document.createElement('h1');
+  h1.appendChild(document.createTextNode('Most Likely to Die Next!'));
+  document.body.appendChild(h1);
+}
+
+function render_instructions() {
+  var p_tag = document.createElement('p');
+  p_tag.appendChild(document.createTextNode('The process here is simple. You will be shown three characters from the Game of Thrones tv show. Just pick which of the three you believe is the most likely to be killed off next!'));
+  document.body.appendChild(p_tag);
+  p_tag = document.createElement('p');
+  p_tag.appendChild(document.createTextNode('After you\'ve gone through 16 sets of photos, you will have the option of seeing the statistics you chose!'));
+  document.body.appendChild(p_tag);
 }
 
 function load_objects(name_array) {
@@ -95,20 +112,27 @@ function load_state() {
 }
 
 function render_image_containers() {
-  gebi('pic-container').innerHTML = '';
+  var pic_container = document.createElement('div');
+  pic_container.setAttribute('id','pic-container');
+  pic_container.setAttribute('class','delayedfadein');
+  pic_container.innerHTML = '';
   for (var i = 0; i < NUM_PICS_DISPLAYED; i++) {
     var img = document.createElement('img');
     img.setAttribute('class', 'headshot');
     img.setAttribute('id', 'pic' + i);
+    var img_span = document.createElement('div');
+    img_span.setAttribute('class', 'img-holder');
+    img_span.appendChild(img);
     var caption = document.createElement('figcaption');
     caption.setAttribute('id', 'vote' + i);
     var text = document.createTextNode('');
     caption.appendChild(text);
     var pic_div = document.createElement('div');
-    pic_div.appendChild(img);
+    pic_div.appendChild(img_span);
     pic_div.appendChild(caption);
-    gebi('pic-container').appendChild(pic_div);
+    pic_container.appendChild(pic_div);
   }
+  document.body.appendChild(pic_container);
   set_pic_listeners();
 }
 
@@ -157,19 +181,21 @@ function render_buttons() {
 
 function display_app() {
   // State 0 is just the Heading, Instructions, and three images with listeners
-  render_image_containers();
+  if (localStorage.state == 0) {
+    smooth_scroll_to(document.body);
+    render_image_containers();
+  }
+  add_delayed_fadein();
   var last_shown = localStorage.last_shown;
   if (last_shown) {
     last_shown = JSON.parse(last_shown);
-    populate_images(last_shown);
+    window.setTimeout(populate_images, 1000, last_shown);
   } else {
-    populate_images(); // This really only happens when the app is run for the first time.
+    window.setTimeout(populate_images, 1000); // This really only happens when the app is run for the first time.
   }
   render_buttons();
   easter_egg();
-  if (localStorage.state == 0) {
-    smooth_scroll_to(document.body);
-  }
+  window.setTimeout(remove_delayed_fadein,2000);
   if (localStorage.state > 0) {
     // State 1 adds the display of the two choice buttons
     //  and disables listeners on the images
@@ -202,6 +228,26 @@ function display_app() {
   }
 }
 
+function add_delayed_fadein() {
+  var p_tag_array = document.getElementsByTagName('p');
+  for (var i = 0; i < p_tag_array.length; i++) {
+    p_tag_array[i].classList.add('delayedfadein');
+  }
+}
+
+function remove_delayed_fadein() {
+  var p_tag_array = document.getElementsByTagName('p');
+  for (var i = 0; i < p_tag_array.length; i++) {
+    p_tag_array[i].classList.remove('delayedfadein');
+  }
+  gebi('pic-container').classList.remove('delayedfadein');
+}
+
+function fade_out_images() {
+  gebi('pic-container').classList.add('fadeout');
+  window.setTimeout(populate_images,1000);
+}
+
 // display 3 fresh images
 function populate_images(saved) {
   var showing = [];
@@ -221,6 +267,13 @@ function populate_images(saved) {
     showing[i] = selection;
   }
   localStorage.last_shown = JSON.stringify(showing);
+  gebi('pic-container').classList.remove('fadeout');
+  gebi('pic-container').classList.add('fadein');
+  window.setTimeout(complete_populate,1000);
+
+  function complete_populate() {
+    gebi('pic-container').classList.remove('fadein');
+  }
 }
 
 // When a click is detected, log the vote and swap in a new pic
@@ -228,10 +281,14 @@ function swap_pic(event) {
   total_clicks++;
   save_total_clicks();
   choices[event.target.attributes[3].value].add_click();
-  check_finished();
+  gebi(event.target.id).classList.add('whiteout');
+  window.setTimeout(check_finished, 500, event.target.id);
 }
 
-function check_finished() {
+function check_finished(element) {
+  if (element) {
+    gebi(element).classList.remove('whiteout');
+  }
   if (total_clicks > 15 && JSON.parse(localStorage.bonus_round) == false) {
     localStorage.state = 1;
     display_app();
@@ -239,7 +296,7 @@ function check_finished() {
     localStorage.state = 3;
     display_app();
   } else {
-    populate_images();
+    fade_out_images();
   }
 }
 
@@ -247,7 +304,7 @@ function more_clicks() {
   localStorage.bonus_round = JSON.stringify(true);
   localStorage.state = 2;
   display_app();
-  populate_images(); // Needed for a new set of images to appear with the button click.
+  // populate_images(); // Needed for a new set of images to appear with the button click. ...?
 }
 
 function display_results() {
@@ -325,7 +382,6 @@ function render_restart_button() {
   button = document.createElement('button');
   button.appendChild(document.createTextNode('OH NOES, SPOILERZ!'));
   button.setAttribute('id','spoilers-button');
-  // button.addEventListener('click', video_modal);
   button_div = document.createElement('div');
   button_div.setAttribute('id','spoiler-button-div');
   button_div.appendChild(button);
@@ -333,13 +389,15 @@ function render_restart_button() {
 }
 
 function restart() {
-  document.body.removeChild(gebi('restart-button-div'));
-  document.body.removeChild(gebi('spoiler-button-div'));
-  document.body.removeChild(gebi('canvas-container'));
-  document.body.removeChild(gebi('button_div'));
-
+  // document.body.removeChild(gebi('restart-button-div'));
+  // document.body.removeChild(gebi('spoiler-button-div'));
+  // document.body.removeChild(gebi('canvas-container'));
+  // document.body.removeChild(gebi('button_div'));
+  document.body.innerHTML = '';
   localStorage.state = 0;
-  display_app();
+  render_heading();
+  render_instructions();
+  load_state();
   populate_images(); // Needed because the pics will not update otherwise.
 }
 
@@ -353,7 +411,8 @@ function prepare_modal_div() {
   // video.setAttribute('controls','controls');
   // video.setAttribute('src','video.mp4');
   // video_div.appendChild(video);
-  // modal div
+
+  // create modal div
   var modal_div = document.createElement('div');
   modal_div.setAttribute('class', 'modal');
   modal_div.setAttribute('id', 'spoilers-modal');
