@@ -1,6 +1,54 @@
+@font-face {
+    font-family: 'Game of Thrones';
+    src: url('../fonts/game-of-thrones.ttf');
+}
+
 body {
+  background-image: url('../img/got-background.jpg');
+  background-position: top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-color: #222;
+
   width: 80%;
   margin: 40px auto;
+}
+
+h1 {
+  font-size: 20px;
+  font-family: 'Game of Thrones', monospace;
+  text-transform: uppercase;
+  text-align: center;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.delayedfadein {
+  animation: 2s delayedfadein;
+  -webkit-animation: 2s delayedfadein;
+  -moz-animation: 2s delayedfadein;
+}
+
+p {
+  font-family: fantasy;
+  font-size: 22px;
+  width: 80%;
+  margin: 20px;
+}
+
+#spoilers-button {
+  animation: 1s borderanimation infinite;
+  -webkit-animation: 1s borderanimation infinite;
+  -moz-animation: 1s borderanimation infinite;
+}
+
+#spoiler-button-div {
+  float: right;
+  margin: -130px 100px 0 0;
+
+  animation: 5s delayedslidein;
+  -webkit-animation: 5s delayedslidein;
+  -moz-animation: 5s delayedslidein;
 }
 
 #pic-container {
@@ -8,8 +56,15 @@ body {
   justify-content: space-around;
 }
 
-#results_container > div {
-  margin: 10px;
+.img-holder {
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+
+#canvas-container {
+  background-color: white;
+  border: 2px black solid;
 }
 
 .monospace {
@@ -20,11 +75,14 @@ body {
 .headshot {
   height: auto;
   max-width: 100px;
+  margin-bottom: -5px;
+  border: 2px black solid;
 }
 
 figcaption {
   font-size: 10px;
   text-align: center;
+  margin: 15px;
 }
 
 button {
@@ -51,6 +109,10 @@ button {
     box-shadow: 0px 0px 15px 0px #777;
     font-size: 15px;
   }
+
+  h1 {
+    font-size: 24px;
+  }
 }
 
 @media (min-width:900px) {
@@ -70,6 +132,41 @@ button {
     box-shadow: 0px 0px 20px 0px #777;
     font-size: 20px;
   }
+
+  #restart-button {
+    box-shadow: 0px 0px 20px 0px #000;
+  }
+
+  #spoilers-button {
+    height: 110px;
+    width: 110px;
+  }
+
+  h1 {
+    font-size: 62px;
+
+    animation: 2s bigheading;
+    -webkit-animation: 2s bigheading;
+    -moz-animation: 2s bigheading;
+  }
+}
+
+img.whiteout {
+  animation: 0.5s whiteout;
+  -webkit-animation: 0.5s whiteout;
+  -moz-animation: 0.5s whiteout;
+}
+
+div.fadeout {
+  animation: 1s fade-anim;
+  -webkit-animation: 1s fade-anim;
+  -moz-animation: 1s fade-anim;
+}
+
+div.fadein {
+  animation: 1s fadein-anim;
+  -webkit-animation: 1s fadein-anim;
+  -moz-animation: 1s fadein-anim;
 }
 
 .flex-center {
@@ -86,7 +183,7 @@ button {
 .grey > button, .grey > button:hover, .grey > button:active {
   background-color: #ddd;
   color: #eee;
-  box-shadow: 0px 0px 20px 0px #bbb;
+  box-shadow: 0px 0px 0px 0px #fff;
 }
 
 button:hover {
@@ -109,4 +206,180 @@ button:focus {
 
 ::-moz-selection {
   background: white;
+}
+{
+
+}
+/* Animations */
+
+@keyframes bigheading {
+  0% {
+    font-size: 400px;
+    margin-left: -500%;
+    margin-right: -500%;
+  }
+  100% {
+    font-size: 62px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@-webkit-keyframes bigheading {
+  0% {
+    font-size: 400px;
+    margin-left: -500%;
+    margin-right: -500%;
+  }
+  100% {
+    font-size: 62px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@keyframes delayedfadein {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes delayedfadein {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes delayedslidein {
+  0% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  80% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  100% {
+    opacity: 1;
+    margin-right: 100px;
+  }
+}
+
+@-webkit-keyframes delayedslidein {
+  0% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  80% {
+    opacity: 0;
+    margin-right: -100px;
+  }
+  100% {
+    opacity: 1;
+    margin-right: 100px;
+  }
+}
+
+@keyframes borderanimation {
+  0% {
+    box-shadow: 0px 0px 50px #ff0000;
+  }
+  50% {
+    box-shadow: 0px 0px 0px #ff0000;
+  }
+  100% {
+    box-shadow: 0px 0px 50px #ff0000;
+  }
+}
+
+@-webkit-keyframes borderanimation {
+  0% {
+    box-shadow: 0px 0px 10px #ff0000;
+  }
+  50% {
+    box-shadow: 0px 0px 0px #ff0000;
+  }
+  100% {
+    box-shadow: 0px 0px 10px #ff0000;
+  }
+}
+
+@keyframes whiteout {
+  0% {
+    background-color: white;
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0;
+  }
+  99% {
+    opacity: 1.0;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+@-webkit-keyframes whiteout {
+  0% {
+    background-color: white;
+    opacity: 1.0;
+  }
+  50% {
+    opacity: 0;
+  }
+  99% {
+    opacity: 1.0;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+@keyframes fade-anim {
+  0% {
+    opacity: 1.0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fade-anim {
+  0% {
+    opacity: 1.0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadein-anim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1.0;
+  }
+}
+
+@-webkit-keyframes fadein-anim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1.0;
+  }
 }
